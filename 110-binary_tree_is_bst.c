@@ -1,59 +1,35 @@
 #include "binary_trees.h"
+#include "limits.h"
 
 /**
- * compare_all_left_children -  compares the values of tree node
- * to all nodes of the left subtree
- * @tree: pointer to root node of the subtree
- * @child: pointer to the node of left child
- * Return: 1 if all values in left subtree are less than the value of tree,
- * 0 if not
+ * is_bst_helper - Checks if a binary tree is a valid binary search tree.
+ * @tree: A pointer to the root node of the tree to check.
+ * @lo: The value of the smallest node visited thus far.
+ * @hi: The value of the largest node visited this far.
+ *
+ * Return: If the tree is a valid BST, 1, otherwise, 0.
  */
-int compare_all_left_children(const binary_tree_t *tree, binary_tree_t *child)
+int is_bst_helper(const binary_tree_t *tree, int lo, int hi)
 {
-	if (!child)
-		return (1);
-	if (tree->n <= child->n)
-		return (0);
-	return (1 * compare_all_left_children(tree, child->left)
-			* compare_all_left_children(tree, child->right));
+	if (tree != NULL)
+	{
+		if (tree->n < lo || tree->n > hi)
+			return (0);
+		return (is_bst_helper(tree->left, lo, tree->n - 1) &&
+			is_bst_helper(tree->right, tree->n + 1, hi));
+	}
+	return (1);
 }
 
 /**
- * compare_all_right_children -  compares the values of tree node
- * to all nodes of the right subtree
- * @tree: pointer to root node of the subtree
- * @child: pointer to the node of right child
- * Return: 1 if all values in right subtree are greater than the value of tree,
- * 0 if not
- */
-int compare_all_right_children(const binary_tree_t *tree, binary_tree_t *child)
-{
-	if (!child)
-		return (1);
-	if (tree->n >= child->n)
-		return (0);
-	return (1 * compare_all_right_children(tree, child->left)
-			* compare_all_right_children(tree, child->right));
-}
-
-
-/**
- * binary_tree_is_bst - checks if a binary tree is a valid Binary Search Tree
- * @tree: a pointer to the root node of the tree to check
- * Return: 1 if Binary Search Tree, 0 if not
+ * binary_tree_is_bst - Checks if a binary tree is a valid binary search tree.
+ * @tree: A pointer to the root node of the tree to check.
+ *
+ * Return: 1 if tree is a valid BST, and 0 otherwise
  */
 int binary_tree_is_bst(const binary_tree_t *tree)
 {
-	if (!tree)
+	if (tree == NULL)
 		return (0);
-	if (!tree->left && !tree->right)
-		return (1);
-	if ((!tree->left && compare_all_right_children(tree, tree->right))
-			|| (!tree->right && compare_all_left_children(tree, tree->left)))
-		return (1);
-	if (!compare_all_left_children(tree, tree->left)
-			|| !compare_all_right_children(tree, tree->right))
-		return (0);
-	return (1 * binary_tree_is_bst(tree->left)
-			* binary_tree_is_bst(tree->right));
+	return (is_bst_helper(tree, INT_MIN, INT_MAX));
 }
